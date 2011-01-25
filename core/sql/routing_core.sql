@@ -19,6 +19,7 @@
 
 
 CREATE TYPE path_result AS (vertex_id integer, edge_id integer, cost float8);
+CREATE TYPE apsp_result AS (src_vertex_id integer, dest_vertex_id integer, cost float8);
 CREATE TYPE vertex_result AS (x float8, y float8);
 
 -----------------------------------------------------------------------
@@ -53,6 +54,17 @@ CREATE OR REPLACE FUNCTION shortest_path_shooting_star(sql text, source_id integ
          LANGUAGE 'C' IMMUTABLE STRICT; 
 
 -----------------------------------------------------------------------
+-- Core function for all_pairs_shortest_path computation
+-- See README for description
+-----------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION all_pairs_shortest_path(sql text, directed boolean, has_reverse_cost boolean)
+        RETURNS SETOF apsp_result
+        AS '$libdir/librouting'
+        LANGUAGE 'C' IMMUTABLE STRICT;
+
+
+
+-----------------------------------------------------------------------
 -- This function should not be used directly. Use create_graph_tables instead
 --
 -- Insert a vertex into the vertices table if not already there, and
@@ -81,3 +93,7 @@ BEGIN
 END;
 $$
 LANGUAGE 'plpgsql' VOLATILE STRICT; 
+
+
+
+
